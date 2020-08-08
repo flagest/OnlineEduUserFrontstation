@@ -9,31 +9,37 @@
     <div class="sign-up-container">
       <el-form ref="userForm" :model="params">
 
-        <el-form-item class="input-prepend restyle" prop="nickname" :rules="[{ required: true, message: '请输入你的昵称', trigger: 'blur' }]">
+        <el-form-item class="input-prepend restyle" prop="nickname"
+                      :rules="[{ required: true, message: '请输入你的昵称', trigger: 'blur' }]">
           <div>
             <el-input type="text" placeholder="你的昵称" v-model="params.nickname"/>
             <i class="iconfont icon-user"/>
           </div>
         </el-form-item>
 
-        <el-form-item class="input-prepend restyle no-radius" prop="mobile" :rules="[{ required: true, message: '请输入手机号码', trigger: 'blur' },{validator: checkPhone, trigger: 'blur'}]">
+        <el-form-item class="input-prepend restyle no-radius" prop="mobile"
+                      :rules="[{ required: true, message: '请输入手机号码', trigger: 'blur' }
+                      ,{validator: checkPhone, trigger: 'blur'}]">
           <div>
             <el-input type="text" placeholder="手机号" v-model="params.mobile"/>
             <i class="iconfont icon-phone"/>
           </div>
         </el-form-item>
 
-        <el-form-item class="input-prepend restyle no-radius" prop="code" :rules="[{ required: true, message: '请输入验证码', trigger: 'blur' }]">
+        <el-form-item class="input-prepend restyle no-radius" prop="code"
+                      :rules="[{ required: true, message: '请输入验证码', trigger: 'blur' }]">
           <div style="width: 100%;display: block;float: left;position: relative">
             <el-input type="text" placeholder="验证码" v-model="params.code"/>
             <i class="iconfont icon-phone"/>
           </div>
           <div class="btn" style="position:absolute;right: 0;top: 6px;width: 40%;">
-            <a href="javascript:" type="button" @click="getCodeFun()" :value="codeTest" style="border: none;background-color: none">{{codeTest}}</a>
+            <a href="javascript:" type="button" @click="getCodeFun()" :value="codeTest"
+               style="border: none;background-color: none">{{codeTest}}</a>
           </div>
         </el-form-item>
 
-        <el-form-item class="input-prepend" prop="password" :rules="[{ required: true, message: '请输入密码', trigger: 'blur' }]">
+        <el-form-item class="input-prepend" prop="password"
+                      :rules="[{ required: true, message: '请输入密码', trigger: 'blur' }]">
           <div>
             <el-input type="password" placeholder="设置密码" v-model="params.password"/>
             <i class="iconfont icon-password"/>
@@ -67,8 +73,7 @@
 <script>
   import '~/assets/css/sign.css'
   import '~/assets/css/iconfont.css'
-
-  // import registerApi from '@/api/register'
+  import register from '@/api/register'
 
   export default {
     layout: 'sign',
@@ -86,9 +91,51 @@
       }
     },
     methods: {
+      //注册
+      submitRegister() {
+        register.registerMember(this.params).then(response => {
+          if (response.data.success) {
+            this.$message({
+              type: 'succcess',
+              message: '用户注册成功:)'
+            })
+            this.$router.push({path: '/login'})
+          } else {
+            this.$message({
+              type: 'error',
+              message: response.data.message,
+            })
+          }
+        })
+      },
 
+      //获取验证码
+      getCodeFun() {
+        register.getVeirif(this.params.mobile).then(response => {
+          this.sending = false;
+          this.timeDown();
 
-       timeDown() {
+          if (response.data.success) {
+            this.$message({
+              type: 'success',
+              message: '验证码发送成功:)',
+            })
+          } else {
+            this.$message({
+              type: 'error',
+              message: '验证码发送失败:('
+            })
+          }
+        })
+      },
+      checkPhone(rule, value, callback) {
+        //debugger
+        if (!(/^1[34578]\d{9}$/.test(value))) {
+          return callback(new Error('手机号码格式不正确'))
+        }
+        return callback()
+      },
+      timeDown() {
         let result = setInterval(() => {
           --this.second;
           this.codeTest = this.second
@@ -100,17 +147,7 @@
             this.codeTest = "获取验证码"
           }
         }, 1000);
-
       },
-
-
-      checkPhone (rule, value, callback) {
-        //debugger
-        if (!(/^1[34578]\d{9}$/.test(value))) {
-          return callback(new Error('手机号码格式不正确'))
-        }
-        return callback()
-      }
     }
   }
 </script>

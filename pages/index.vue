@@ -131,7 +131,7 @@
         },
         bannerList: [],
         teacherList: [],
-        courseList: []
+        courseList: [],
 
       }
     },

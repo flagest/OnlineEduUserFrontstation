@@ -28,7 +28,7 @@
           </ul>
           <!-- / nav -->
           <ul class="h-r-login">
-            <li id="no-login">
+            <li v-if="!loginInfo.id" id="no-login">
               <a href="/login" title="登录">
                 <em class="icon18 login-icon">&nbsp;</em>
                 <span class="vam ml5">登录</span>
@@ -38,24 +38,24 @@
                 <span class="vam ml5">注册</span>
               </a>
             </li>
-            <li class="mr10 undis" id="is-login-one">
+            <li v-if="loginInfo.id" class="mr10" id="is-login-one">
               <a href="#" title="消息" id="headerMsgCountId">
                 <em class="icon18 news-icon">&nbsp;</em>
               </a>
               <q class="red-point" style="display: none">&nbsp;</q>
             </li>
-            <li class="h-r-user undis" id="is-login-two">
+            <li v-if="loginInfo.id" class="h-r-user" id="is-login-two">
               <a href="#" title>
                 <img
-                  src="~/assets/img/avatar-boy.gif"
+                  :src="loginInfo.avatar"
                   width="30"
                   height="30"
                   class="vam picImg"
                   alt
                 >
-                <span class="vam disIb" id="userName"></span>
+                <span class="vam disIb" id="userName">{{loginInfo.nickname}}</span>
               </a>
-              <a href="javascript:void(0)" title="退出" onclick="exit();" class="ml5">退出</a>
+              <a href="javascript:void(0)" title="退出" @click="exit()" class="ml5">退出</a>
             </li>
             <!-- /未登录显示第1 li；登录后显示第2，3 li -->
           </ul>
@@ -134,6 +134,61 @@
   import "~/assets/css/theme.css";
   import "~/assets/css/global.css";
   import "~/assets/css/web.css";
+  import cookie from 'js-cookie';
+  import login from '@/api/login'
 
-  export default {};
+
+  export default {
+    data() {
+      return {
+        token: '',
+        loginInfo: {
+          id: '',
+          age: '',
+          avatar: '',
+          mobile: '',
+          nickname: '',
+          sex: ''
+        },
+      }
+    },
+    created() {
+      //重路径中获取值
+      this.token = this.$route.query.token;
+      if (this.token) {
+        this.Wxlogin();
+      }
+      this.showInfo()
+    },
+    methods: {
+      Wxlogin() {
+        cookie.set('token', this.token, {domain: 'localhost'})
+        cookie.set('guli_ucenter', '', {domain: 'localhost'})
+        login.getLoginInfo().then(response => {
+          this.loginInfo = response.data.data.userInfo;
+          cookie.set('guli_ucenter', this.loginInfo, {domain: 'localhost'})
+        })
+      },
+      //退出方法
+      exit() {
+        //清空cookie值
+        cookie.set('guli_ucenter', '', {domain: 'localhost'})
+        cookie.set('token', '', {domain: 'localhost'})
+        // this.loginInfo = {};
+        //回到首页
+        window.location.href = '/'
+      },
+      //创建方法，重cookie中获取用户信息
+      showInfo() {
+        //从cookie获取用户信息，获取的是字符串
+        var userStr = cookie.get('guli_ucenter');
+        // debugger
+        //将字符串转为json对象
+        if (userStr) {
+          this.loginInfo = JSON.parse(userStr);
+        }
+      },
+    }
+
+  };
 </script>
