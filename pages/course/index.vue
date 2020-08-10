@@ -16,10 +16,10 @@
             <dd class="c-s-dl-li">
               <ul class="clearfix">
                 <li>
-                  <a title="全部" href="#">全部</a>
+                  <a title="全部" href="#" @click="initCourseFirst()">全部</a>
                 </li>
-                <li v-for="(item,index) in subjectNestedList" :key="index">
-                  <a :title="item.title" href="#">{{item.title}}</a>
+                <li v-for="(item,index) in subjectNestedList" :key="index" :class="{active:oneIndex==index}">
+                  <a :title="item.title" href="#" @click="serachOne(item.id,index)">{{item.title}}</a>
                 </li>
               </ul>
             </dd>
@@ -31,7 +31,7 @@
             <dd class="c-s-dl-li">
               <ul class="clearfix">
                 <li v-for="(item,index) in subSubjectList " :key="index ">
-                  <a :title="item.title" href="#">{{item.title}}</a>
+                  <a :title="item.title" href="#" @click="serachTwo(item.id,index)">{{item.title}}</a>
                 </li>
               </ul>
             </dd>
@@ -159,6 +159,7 @@
     methods: {
       //查询课程列表
       initCourseFirst() {
+        this.searchObj = {};
         courseApi.getFrontCourseList(1, 8, this.searchObj).then(response => {
           this.data = response.data.data;
         })
@@ -167,7 +168,6 @@
       initSubject() {
         courseApi.getAllOneTwoSubject().then(response => {
           this.subjectNestedList = response.data.data.data;
-          this.subSubjectList = response.data.data.children;
         })
       },
       //分页切换
@@ -176,6 +176,42 @@
           this.data = response.data.data;
         })
       },
+      //根据一级分类查询二级分类
+      serachOne(subjectOneId, index) {
+        //把传递index赋值给OneIndex
+        this.oneIndex=index;
+        this.twoIndex=-1;
+
+        this.searchObj = {};
+        //把一级分类赋值给查询对象
+        this.searchObj.subjectParentId = subjectOneId;
+        //分页函数
+        this.gotoPage(1)
+
+        //获取二级分类
+        this.subSubjectList = this.subjectNestedList[index].children;
+
+      },
+      //点击二级分类查询
+      serachTwo(subjectTwoId, index) {
+        this.searchObj = {};
+        this.searchObj.subjectId = subjectTwoId;
+        //分页查询
+        this.gotoPage(1);
+      }
     },
   };
 </script>
+<style scoped>
+  .active {
+    background: #bdbdbd;
+  }
+
+  .hide {
+    display: none;
+  }
+
+  .show {
+    display: block;
+  }
+</style>
