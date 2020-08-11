@@ -30,7 +30,7 @@
             </dt>
             <dd class="c-s-dl-li">
               <ul class="clearfix">
-                <li v-for="(item,index) in subSubjectList " :key="index ">
+                <li v-for="(item,index) in subSubjectList " :key="index" :class="{active:twoIndex==index}">
                   <a :title="item.title" href="#" @click="serachTwo(item.id,index)">{{item.title}}</a>
                 </li>
               </ul>
@@ -47,15 +47,17 @@
           </section>
           <section class="fl">
             <ol class="js-tap clearfix">
-              <li>
-                <a title="关注度" href="#">关注度</a>
+              <li :class="{'current bg-orange' :buyCountSort!=''}">
+                <a title="关注度" href="javascript:void(0);" @click="searchByCount()">销量</a>
+                <span :class="{hiden:buyCountSort==''}">↓</span>
               </li>
-              <li>
-                <a title="最新" href="#">最新</a>
+              <li :class="{'current bg-orange':gmtCreateSort!=''}">
+                <a title="最新" href="javascript:void (0);" @click="serachCreate()">最新</a>
+                <span :class="{hide:gmtCreateSort==''}">↓</span>
               </li>
-              <li class="current bg-orange">
-                <a title="价格" href="#">价格&nbsp;
-                  <span>↓</span>
+              <li :class="{'current bg-orange':priceSort!=''}">
+                <a title="价格" href="javascript:void(0)" @click="serachPrice()">价格&nbsp;&nbsp;
+                  <span :class="{hide:priceSort==''}">↓</span>
                 </a>
               </li>
             </ol>
@@ -75,11 +77,11 @@
                   <section class="course-img">
                     <img :src="item.cover" class="img-responsive" :alt="item.title">
                     <div class="cc-mask">
-                      <a href="/course/1" :title="item.title" class="comm-btn c-btn-1">{{item.title}}</a>
+                      <a :href="'/course/'+item.id" :title="item.title" class="comm-btn c-btn-1">{{item.title}}</a>
                     </div>
                   </section>
                   <h3 class="hLh30 txtOf mt10">
-                    <a href="/course/1" :title="item.title" class="course-title fsize18 c-333">{{item.title}}</a>
+                    <a :href="'/course/'+item.id" :title="item.title" class="course-title fsize18 c-333">{{item.title}}</a>
                   </h3>
                   <section class="mt10 hLh20 of">
                     <span class="fr jgTag bg-green">
@@ -179,8 +181,8 @@
       //根据一级分类查询二级分类
       serachOne(subjectOneId, index) {
         //把传递index赋值给OneIndex
-        this.oneIndex=index;
-        this.twoIndex=-1;
+        this.oneIndex = index;
+        this.twoIndex = -1;
 
         this.searchObj = {};
         //把一级分类赋值给查询对象
@@ -198,6 +200,37 @@
         this.searchObj.subjectId = subjectTwoId;
         //分页查询
         this.gotoPage(1);
+      },
+      //第六根据销量排序
+      searchByCount() {
+        //设置对应值，为了样式生效
+        this.buyCountSort = "1";
+        this.gmtCreateSort = "";
+        this.priceSort = "";
+        this.searchObj.buyCountSort = this.buyCountSort
+        this.searchObj.gmtCreateSort = this.gmtCreateSort
+        this.searchObj.priceSort = this.priceSort
+        this.gotoPage(1)
+      },
+      serachCreate() {
+        //设置对应值，为了样式生效
+        this.buyCountSort = "";
+        this.gmtCreateSort = "1";
+        this.priceSort = "";
+        this.searchObj.buyCountSort = this.buyCountSort
+        this.searchObj.gmtCreateSort = this.gmtCreateSort
+        this.searchObj.priceSort = this.priceSort
+        this.gotoPage(1)
+      },
+      serachPrice() {
+        //设置对应值，为了样式生效
+        this.buyCountSort = "";
+        this.gmtCreateSort = "";
+        this.priceSort = "1";
+        this.searchObj.buyCountSort = this.buyCountSort
+        this.searchObj.gmtCreateSort = this.gmtCreateSort
+        this.searchObj.priceSort = this.priceSort
+        this.gotoPage(1)
       }
     },
   };
