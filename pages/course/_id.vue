@@ -34,7 +34,7 @@
               </span>
             </section>
             <section class="c-attr-mt">
-              <a href="#" title="立即观看" class="comm-btn c-btn-3">立即观看</a>
+              <a @click="createOrders()" title="立即观看" class="comm-btn c-btn-3">立即观看</a>
             </section>
           </section>
         </aside>
@@ -240,6 +240,7 @@
 <script>
   import courseApi from '@/api/course'
   import commoneduApi from '@/api/commonedu'
+  import orderApi from '@/api/order'
 
   export default {
     asyncData({params, error}) {
@@ -264,6 +265,7 @@
         courseInfo: {},
         chapterVideoList: [],
         isbuyCourse: false,
+        orderId: ''
       }
     },
     methods: {
@@ -291,6 +293,21 @@
             })
             this.comment = {}
             this.initComments()
+          } else {
+            this.$message({
+              type: 'error',
+              message: response.data.message
+            })
+          }
+        })
+      },
+      createOrders() {
+        orderApi.addOrder(this.courseId).then(response => {
+          if (response.data.success) {
+            //获取订单号
+            this.orderId = response.data.data.orderId
+            //生成订单后跳转到订单显示页面
+            this.$router.push({path: '/orders/' + this.orderId})
           } else {
             this.$message({
               type: 'error',
