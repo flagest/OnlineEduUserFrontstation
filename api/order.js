@@ -16,5 +16,19 @@ export default {
       url: `/orderservice/order/getOrderInfo/${orderId}`,
       method: 'get'
     })
+  },
+  //生成微信支付二维码接口
+  createNative(orderNo) {
+    return request({
+      url: `/orderservice/paylog//createPayLog/${orderNo}`,
+      method: 'get'
+    })
+  },
+  //查询订单支付状态
+  queryPayStatus(orderNo) {
+    return request({
+      url: `/orderservice/paylog//queryPayStatus/${orderNo}`,
+      method: 'get'
+    })
   }
 }

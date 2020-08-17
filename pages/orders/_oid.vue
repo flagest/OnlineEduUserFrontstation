@@ -88,7 +88,11 @@
     created() {
 
     },
-    methods: {}
+    methods: {
+      toPay() {
+        this.$router.push({path: '/pay/' + this.order.orderNo})
+      }
+    }
   }
 
 </script>
