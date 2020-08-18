@@ -60,7 +60,7 @@
       //查询支付状态的方法
       getPayInfo(out_trade_no) {
         orderApi.queryPayStatus(out_trade_no).then(response => {
-          if (response.data.message==='支付成功:)') {
+          if (response.data.success) {
             //如果字符成功清除定时器
             clearInterval(this.time1)
             this.$message({
