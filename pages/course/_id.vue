@@ -33,8 +33,11 @@
                 <a class="c-fff vam" title="收藏" href="#">收藏</a>
               </span>
             </section>
-            <section class="c-attr-mt">
-              <a @click="createOrders()" title="立即观看" class="comm-btn c-btn-3">立即观看</a>
+            <section class="c-attr-mt" v-if="isBuy||Number(courseWebVO.price)===0">
+              <a  title="立即观看" class="comm-btn c-btn-3">立即观看</a>
+            </section>
+            <section class="c-attr-mt" v-else>
+              <a @click="createOrders()" title="立即购买" class="comm-btn c-btn-3">立即购买</a>
             </section>
           </section>
         </aside>
@@ -244,13 +247,7 @@
 
   export default {
     asyncData({params, error}) {
-      return courseApi.getCourseInfo(params.id).then(response => {
-        return {
-          courseWebVO: response.data.data.courseWebVO,
-          chapterVideoList: response.data.data.chapterVideoList,
-          courseId: params.id,
-        }
-      })
+      return {courseId: params.id}
     },
     data() {
       return {
@@ -262,25 +259,39 @@
           content: '',
           courseId: '',
         },
-        courseInfo: {},
+        courseWebVO: {},
         chapterVideoList: [],
-        isbuyCourse: false,
-        orderId: ''
+        isBuy: false,
+        orderId: '',
       }
     },
+
     methods: {
+      //获取页面信息调用
+      initCourseInfo() {
+        debugger
+        courseApi.getCourseInfo(this.courseId).then(response => {
+          debugger
+          this.courseWebVO = response.data.data.courseWebVO
+          this.chapterVideoList = response.data.data.chapterVideoList
+          this.isBuy = response.data.data.isBuy
+        })
+      }
+      ,
       //初始化页面获取评论信息
       initComments() {
         commoneduApi.getCommentList(this.page, this.limit, this.courseId).then(response => {
           this.data = response.data.data
         })
-      },
+      }
+      ,
       //评论跳转函数
       gotoPage(page) {
         commoneduApi.getCommentList(page, 4, this.courseId).then(response => {
           this.data = response.data.data
         })
-      },
+      }
+      ,
       //添加评论函数
       addComment() {
         this.comment.courseId = this.courseId
@@ -300,7 +311,8 @@
             })
           }
         })
-      },
+      }
+      ,
       createOrders() {
         orderApi.addOrder(this.courseId).then(response => {
           if (response.data.success) {
@@ -316,10 +328,13 @@
           }
         })
       }
-    },
+    }
+    ,
     created() {
       this.initComments()
+      this.initCourseInfo()
     }
-  };
+  }
+  ;
 
 </script>
